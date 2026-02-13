@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Beauty Salon - קביעת תורים</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💅</text></svg>">
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Admin Dots Button (visible on auth page) -->
+  <button id="adminDotsBtn" class="admin-dots" title="כניסת מנהלת">⋮</button>
+
+  <!-- ===== AUTH PAGE ===== -->
+  <div id="authPage" class="auth-container active">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">💅</div>
+        <h2>Beauty Salon</h2>
+        <p>קביעת תורים בקלות</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginName">שם מלא</label>
+          <input type="text" id="loginName" placeholder="הכניסי את שמך" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPhone">מספר טלפון</label>
+          <input type="tel" id="loginPhone" placeholder="050-0000000" required dir="ltr" style="text-align: right;">
+        </div>
+        <button type="submit" class="btn btn-primary">כניסה</button>
+      </form>
+
+      <div class="auth-switch">
+        <span>לקוחה חדשה? </span>
+        <a id="showRegister">הרשמי כאן</a>
+      </div>
+
+      <!-- Register Form (hidden by default) -->
+      <form id="registerForm" style="display:none;">
+        <div class="form-group">
+          <label for="regName">שם מלא</label>
+          <input type="text" id="regName" placeholder="הכניסי את שמך המלא" required>
+        </div>
+        <div class="form-group">
+          <label for="regPhone">מספר טלפון</label>
+          <input type="tel" id="regPhone" placeholder="050-0000000" required dir="ltr" style="text-align: right;">
+        </div>
+        <button type="submit" class="btn btn-primary">הרשמה</button>
+      </form>
+
+      <div id="registerSwitch" class="auth-switch" style="display:none;">
+        <span>כבר רשומה? </span>
+        <a id="showLogin">התחברי כאן</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN LOGIN MODAL ===== -->
+  <div id="adminModal" class="modal-overlay">
+    <div class="modal">
+      <h3>🔐 כניסת מנהלת</h3>
+      <form id="adminForm">
+        <div class="form-group">
+          <label for="adminName">שם</label>
+          <input type="text" id="adminName" placeholder="שם המנהלת" required>
+        </div>
+        <div class="form-group">
+          <label for="adminPhone">מספר טלפון</label>
+          <input type="tel" id="adminPhone" placeholder="050-0000000" required dir="ltr" style="text-align: right;">
+        </div>
+        <div class="form-group">
+          <label for="adminCode">קוד מנהל</label>
+          <input type="password" id="adminCode" placeholder="הכניסי קוד מנהל" required>
+        </div>
+        <button type="submit" class="btn btn-primary">כניסה כמנהלת</button>
+        <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px;" onclick="closeAdminModal()">ביטול</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP (after login) ===== -->
+  <div id="mainApp" style="display:none;">
+    <header class="app-header">
+      <h1>💅 Beauty Salon</h1>
+      <div class="header-actions">
+        <span id="userName" style="font-size:0.9rem;"></span>
+        <button class="btn-logout" id="logoutBtn">יציאה</button>
+      </div>
+    </header>
+
+    <!-- Booking Page -->
+    <div id="bookingPage" class="page active page-content">
+      <div class="welcome-banner">
+        <h2>שלום <span id="welcomeName"></span> 👋</h2>
+        <p>בחרי תאריך מהלוח כדי לקבוע תור</p>
+      </div>
+
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <button class="calendar-nav" id="prevMonth">❯</button>
+          <h3 id="calendarTitle"></h3>
+          <button class="calendar-nav" id="nextMonth">❮</button>
+        </div>
+        <div class="calendar-days-header">
+          <span>א׳</span><span>ב׳</span><span>ג׳</span><span>ד׳</span><span>ה׳</span><span>ו׳</span><span>ש׳</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+
+      <!-- Treatment Selection (shown after date selected) -->
+      <div id="treatmentSelection" class="treatment-selection">
+        <div class="selected-date-display" id="selectedDateDisplay"></div>
+        <div id="discountBanner" class="discount-banner" style="display:none;"></div>
+
+        <h3 class="section-title">בחרי סוג טיפול:</h3>
+        <div class="treatment-list" id="treatmentList"></div>
+
+        <div class="time-selection">
+          <h3 class="section-title">בחרי שעה מועדפת (אופציונלי):</h3>
+          <div class="time-slots" id="timeSlots">
+            <button class="time-slot" data-time="09:00">09:00</button>
+            <button class="time-slot" data-time="10:00">10:00</button>
+            <button class="time-slot" data-time="11:00">11:00</button>
+            <button class="time-slot" data-time="12:00">12:00</button>
+            <button class="time-slot" data-time="13:00">13:00</button>
+            <button class="time-slot" data-time="14:00">14:00</button>
+            <button class="time-slot" data-time="15:00">15:00</button>
+            <button class="time-slot" data-time="16:00">16:00</button>
+            <button class="time-slot" data-time="17:00">17:00</button>
+            <button class="time-slot" data-time="18:00">18:00</button>
+            <button class="time-slot" data-time="19:00">19:00</button>
+            <button class="time-slot" data-time="20:00">20:00</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="appointmentNotes">הערות (אופציונלי)</label>
+          <textarea id="appointmentNotes" rows="2" placeholder="הערה מיוחדת לגבי הטיפול..."></textarea>
+        </div>
+
+        <button id="bookBtn" class="btn btn-primary" disabled>קביעת תור</button>
+      </div>
+    </div>
+
+    <!-- My Appointments Page -->
+    <div id="appointmentsPage" class="page page-content">
+      <h3 class="section-title">📋 התורים שלי</h3>
+      <div id="myAppointments"></div>
+    </div>
+
+    <!-- Admin Page -->
+    <div id="adminPage" class="page page-content" style="display:none;">
+      <!-- Discount Management -->
+      <div class="admin-section">
+        <h3>🏷️ ניהול מבצעים והנחות</h3>
+        <form id="discountForm">
+          <div class="form-group">
+            <label for="discountDate">תאריך</label>
+            <input type="date" id="discountDate" required>
+          </div>
+          <div class="form-group">
+            <label for="discountDesc">תיאור המבצע</label>
+            <input type="text" id="discountDesc" placeholder="לדוגמה: 20% הנחה על מניקור!" required>
+          </div>
+          <div class="form-group">
+            <label for="discountType">סוג הנחה</label>
+            <select id="discountType">
+              <option value="percent">אחוז הנחה (%)</option>
+              <option value="amount">סכום קבוע (₪)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="discountValue">ערך ההנחה</label>
+            <input type="number" id="discountValue" placeholder="לדוגמה: 20" min="1">
+          </div>
+          <div class="form-group">
+            <label for="discountTreatment">טיפול ספציפי (או כל הטיפולים)</label>
+            <select id="discountTreatment">
+              <option value="">כל הטיפולים</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">הוסיפי מבצע</button>
+        </form>
+
+        <div style="margin-top:20px;">
+          <h4 style="margin-bottom:10px;">מבצעים פעילים:</h4>
+          <div id="discountsList"></div>
+        </div>
+      </div>
+
+      <!-- Notification Settings -->
+      <div class="admin-section">
+        <h3>🔔 הגדרות התראות</h3>
+        <div class="form-group">
+          <label for="notifEmail">אימייל לקבלת התראות</label>
+          <input type="email" id="notifEmail" placeholder="your@email.com" dir="ltr" style="text-align:right;">
+        </div>
+        <div class="form-group">
+          <label for="notifWhatsapp">מספר וואטסאפ (עם קידומת מדינה)</label>
+          <input type="tel" id="notifWhatsapp" placeholder="972501234567" dir="ltr" style="text-align:right;">
+        </div>
+        <button class="btn btn-primary" id="saveNotifSettings">שמירת הגדרות</button>
+      </div>
+
+      <!-- All Appointments -->
+      <div class="admin-section">
+        <h3>📅 כל התורים</h3>
+        <div id="allAppointments"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="bookingPage">
+        <span class="nav-icon">📅</span>
+        <span>קביעת תור</span>
+      </button>
+      <button class="nav-item" data-page="appointmentsPage">
+        <span class="nav-icon">📋</span>
+        <span>התורים שלי</span>
+      </button>
+      <button class="nav-item" data-page="adminPage" id="adminNavItem" style="display:none;">
+        <span class="nav-icon">⚙️</span>
+        <span>ניהול</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
